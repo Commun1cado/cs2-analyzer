@@ -61,8 +61,9 @@ html, body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  margin-top: 25vh;
+  flex: 1;
 }
 
 .title {
@@ -123,37 +124,38 @@ html, body {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  width: 100%;
-  max-width: 260px;
-  padding: 14px 24px;
-  background: var(--orange);
-  color: var(--bg);
-  border: none;
-  border-radius: 10px;
+  padding: 12px 32px;
+  background: transparent;
+  color: var(--orange);
+  border: 1px solid var(--orange);
+  border-radius: 100px;
   cursor: pointer;
   overflow: hidden;
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.3s ease;
+              background 0.3s ease,
+              color 0.3s ease;
 }
 
 .btn-connect:active {
   transform: scale(0.96);
+  background: var(--orange);
+  color: var(--bg);
 }
 
 .btn-text {
   font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 13px;
-  letter-spacing: 0.1em;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
 .btn-arrow {
-  font-size: 16px;
+  font-size: 14px;
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Shimmer effect on button */
+/* Subtle shimmer */
 .btn-connect::after {
   content: '';
   position: absolute;
@@ -164,7 +166,7 @@ html, body {
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.15),
+    rgba(255, 85, 0, 0.1),
     transparent
   );
   animation: shimmer 3s ease-in-out infinite;

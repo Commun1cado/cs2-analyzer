@@ -118,9 +118,9 @@
       // Size: adapted for screen
       const sizeRand = Math.random();
       if (isMobile) {
-        sizes[i] = sizeRand < 0.6 ? 1.0 + Math.random() * 1.0
-                 : sizeRand < 0.9 ? 1.8 + Math.random() * 1.2
-                 : 2.5 + Math.random() * 1.5;
+        sizes[i] = sizeRand < 0.5 ? 1.5 + Math.random() * 1.5
+                 : sizeRand < 0.85 ? 2.5 + Math.random() * 2.0
+                 : 4.0 + Math.random() * 2.5;
       } else {
         sizes[i] = sizeRand < 0.5 ? 2.0 + Math.random() * 2.5
                  : sizeRand < 0.85 ? 4.0 + Math.random() * 3.0
