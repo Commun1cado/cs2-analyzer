@@ -15,15 +15,16 @@
     return;
   }
 
-  // --- Config ---
-  const PARTICLE_COUNT = 15000;
-  const REPEL_RADIUS = 0.06;
+  // --- Config (adapt to screen size) ---
+  const isMobile = window.innerWidth < 500;
+  const PARTICLE_COUNT = isMobile ? 8000 : 15000;
+  const REPEL_RADIUS = isMobile ? 0.08 : 0.06;
   const REPEL_FORCE = 0.006;
   const SNAP_BACK = 0.02;
   const FRICTION = 0.94;
   const DRIFT_SPEED = 0.0002;
   const ORANGE_RATIO = 0.35;
-  const TRAIL_LENGTH = 12; // positions in trail
+  const TRAIL_LENGTH = 12;
 
   // --- Shaders ---
   const vertexShaderSource = `
@@ -114,11 +115,17 @@
       velocities[i * 2] = (Math.random() - 0.5) * DRIFT_SPEED;
       velocities[i * 2 + 1] = (Math.random() - 0.5) * DRIFT_SPEED;
 
-      // Size: bigger particles
+      // Size: adapted for screen
       const sizeRand = Math.random();
-      sizes[i] = sizeRand < 0.5 ? 2.0 + Math.random() * 2.5
-               : sizeRand < 0.85 ? 4.0 + Math.random() * 3.0
-               : 6.0 + Math.random() * 4.0;
+      if (isMobile) {
+        sizes[i] = sizeRand < 0.6 ? 1.0 + Math.random() * 1.0
+                 : sizeRand < 0.9 ? 1.8 + Math.random() * 1.2
+                 : 2.5 + Math.random() * 1.5;
+      } else {
+        sizes[i] = sizeRand < 0.5 ? 2.0 + Math.random() * 2.5
+                 : sizeRand < 0.85 ? 4.0 + Math.random() * 3.0
+                 : 6.0 + Math.random() * 4.0;
+      }
 
       // Alpha
       baseAlphas[i] = 0.15 + Math.random() * 0.55;
@@ -314,7 +321,7 @@
       if (trail[i].x < 0 || trail[i + 1].x < 0) continue;
       const t = 1 - i / trail.length;
       const alpha = t * 0.35;
-      const lineWidth = t * 3;
+      const lineWidth = isMobile ? t * 1.5 : t * 3;
 
       tctx.beginPath();
       tctx.moveTo(trail[i].x, trail[i].y);
