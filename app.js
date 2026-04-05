@@ -1,5 +1,6 @@
 /* ============================================
-   CS2 ANALYZER — Telegram Mini App Init
+   CS2 ANALYZER — Welcome Screen Logic
+   Split text + Magnetic button + Live stats + Ripple
    ============================================ */
 
 (function () {
@@ -8,30 +9,154 @@
   const tg = window.Telegram?.WebApp;
 
   if (tg) {
-    // Expand to full screen
     tg.expand();
     tg.ready();
-
-    // Set header color to match our dark theme
     tg.setHeaderColor('#0a0a0a');
     tg.setBackgroundColor('#0a0a0a');
-
-    // Disable closing confirmation (welcome screen)
     tg.enableClosingConfirmation();
   }
 
-  // Connect button
-  const connectBtn = document.getElementById('connectBtn');
-  if (connectBtn) {
-    connectBtn.addEventListener('click', () => {
-      if (tg) {
-        // In production: redirect to FACEIT OAuth
-        // For now: haptic feedback + alert
-        tg.HapticFeedback.impactOccurred('medium');
-        tg.showAlert('FACEIT авторизация будет доступна в следующем обновлении');
-      } else {
-        alert('Откройте через Telegram для подключения FACEIT');
-      }
+  // ============================================
+  // 1. SPLIT TEXT ANIMATION
+  // ============================================
+  const titleLines = document.querySelectorAll('[data-split]');
+  let totalCharDelay = 0.3;
+
+  titleLines.forEach((line) => {
+    const text = line.dataset.split;
+    line.innerHTML = '';
+    for (let i = 0; i < text.length; i++) {
+      const span = document.createElement('span');
+      span.className = 'char';
+      span.textContent = text[i] === ' ' ? '\u00A0' : text[i];
+      span.style.animationDelay = `${totalCharDelay}s`;
+      totalCharDelay += 0.05;
+      line.appendChild(span);
+    }
+    totalCharDelay += 0.1; // pause between lines
+  });
+
+  // ============================================
+  // 2. MAGNETIC BUTTON
+  // ============================================
+  const btn = document.getElementById('connectBtn');
+  const magnet = document.getElementById('btnMagnet');
+  const btnStrength = 0.25;
+  const textStrength = 0.4;
+  let btnRect = null;
+  let rafId = null;
+
+  function updateBtnRect() {
+    btnRect = btn.getBoundingClientRect();
+  }
+
+  function onBtnMove(e) {
+    if (!btnRect) updateBtnRect();
+    const x = e.clientX - btnRect.left - btnRect.width / 2;
+    const y = e.clientY - btnRect.top - btnRect.height / 2;
+    cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(() => {
+      btn.style.transform = `translate(${x * btnStrength}px, ${y * btnStrength}px)`;
+      magnet.style.transform = `translate(${x * textStrength}px, ${y * textStrength}px)`;
     });
   }
+
+  function onBtnLeave() {
+    cancelAnimationFrame(rafId);
+    btn.style.transform = '';
+    magnet.style.transform = '';
+  }
+
+  // Only enable magnetic on devices with hover
+  if (window.matchMedia('(hover: hover)').matches) {
+    btn.addEventListener('mouseenter', updateBtnRect);
+    btn.addEventListener('mousemove', onBtnMove);
+    btn.addEventListener('mouseleave', onBtnLeave);
+    window.addEventListener('resize', updateBtnRect);
+    window.addEventListener('scroll', updateBtnRect);
+  }
+
+  btn.addEventListener('click', () => {
+    if (tg) {
+      tg.HapticFeedback.impactOccurred('medium');
+      tg.showAlert('FACEIT авторизация будет доступна в следующем обновлении');
+    } else {
+      console.log('FACEIT connect clicked');
+    }
+  });
+
+  // ============================================
+  // 3. LIVE STATS ROTATION
+  // ============================================
+  const stats = [
+    '1.42 K/D',
+    '73% HS',
+    'ADR 98.2',
+    '1923 ELO',
+    'RATING 1.34',
+    '58% WR',
+    'FIRST KILL 42%',
+    'CLUTCH 67%',
+    'TRADE 87%',
+    'LEVEL 8',
+  ];
+
+  const statValueEl = document.getElementById('statValue');
+  let statIndex = 0;
+
+  function scrambleText(el, target, duration = 400) {
+    const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ%/.';
+    const startTime = performance.now();
+
+    function update() {
+      const elapsed = performance.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+
+      let result = '';
+      for (let i = 0; i < target.length; i++) {
+        if (progress * target.length > i) {
+          result += target[i];
+        } else {
+          result += chars[Math.floor(Math.random() * chars.length)];
+        }
+      }
+      el.textContent = result;
+
+      if (progress < 1) {
+        requestAnimationFrame(update);
+      }
+    }
+    update();
+  }
+
+  function rotateStat() {
+    statIndex = (statIndex + 1) % stats.length;
+    scrambleText(statValueEl, stats[statIndex]);
+  }
+
+  // Start rotation after initial fade-in
+  setTimeout(() => {
+    setInterval(rotateStat, 2200);
+  }, 2500);
+
+  // ============================================
+  // 4. RIPPLE EFFECT (dispatches to particles.js)
+  // ============================================
+  function emitRipple(x, y) {
+    window.dispatchEvent(new CustomEvent('particle-ripple', {
+      detail: { x, y }
+    }));
+  }
+
+  document.addEventListener('click', (e) => {
+    // Don't ripple on button click
+    if (e.target.closest('.btn-connect')) return;
+    emitRipple(e.clientX, e.clientY);
+  });
+
+  document.addEventListener('touchstart', (e) => {
+    if (e.target.closest('.btn-connect')) return;
+    const t = e.touches[0];
+    emitRipple(t.clientX, t.clientY);
+  }, { passive: true });
 })();

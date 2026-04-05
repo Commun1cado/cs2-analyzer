@@ -6,7 +6,7 @@
   <title>CS2 Analyzer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
@@ -16,16 +16,23 @@
   <div class="content">
     <div class="hero">
       <h1 class="title">
-        <span class="title-line title-line--white">CS2</span>
-        <span class="title-line title-line--orange">ANALYZER</span>
+        <span class="title-line title-line--white" data-split="CS2"></span>
+        <span class="title-line title-line--orange" data-split="ANALYZER"></span>
       </h1>
       <p class="subtitle">Твоя игра. Разобрана по кадрам.</p>
+
+      <div class="live-stats" id="liveStats">
+        <span class="stat-label">LIVE</span>
+        <span class="stat-value" id="statValue">1.42 K/D</span>
+      </div>
     </div>
 
     <div class="bottom">
       <button class="btn-connect" id="connectBtn">
-        <span class="btn-text">ПОДКЛЮЧИТЬ FACEIT</span>
-        <span class="btn-arrow">&rarr;</span>
+        <span class="btn-magnet" id="btnMagnet">
+          <span class="btn-text">ПОДКЛЮЧИТЬ FACEIT</span>
+          <span class="btn-arrow">&rarr;</span>
+        </span>
       </button>
       <p class="hint">Привяжи аккаунт и начни анализировать</p>
     </div>

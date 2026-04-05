@@ -174,6 +174,12 @@
     trail.push({ x: -1, y: -1 });
   }
 
+  // --- Ripples ---
+  const ripples = [];
+  const RIPPLE_DURATION = 1200;
+  const RIPPLE_MAX_RADIUS = 0.4;
+  const RIPPLE_FORCE = 0.05;
+
   // --- Resize ---
   function resize() {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -218,6 +224,29 @@
 
         // Also repel from trail segments (worm body pushes particles)
         repelFromTrail(i);
+      }
+
+      // Ripples (expanding shockwaves)
+      for (let r = 0; r < ripples.length; r++) {
+        const ripple = ripples[r];
+        const rx = ripple.x;
+        const ry = ripple.y;
+        const progress = ripple.age / RIPPLE_DURATION;
+        const radius = RIPPLE_MAX_RADIUS * progress;
+        const thickness = 0.04;
+
+        const dx = positions[ix] - rx;
+        const dy = positions[iy] - ry;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        // Only push particles that are at the wave front
+        if (Math.abs(dist - radius) < thickness && dist > 0.001) {
+          const force = (1 - progress) * RIPPLE_FORCE * (1 - Math.abs(dist - radius) / thickness);
+          const invDist = 1.0 / dist;
+          velocities[ix] += dx * invDist * force;
+          velocities[iy] += dy * invDist * force;
+          alphas[i] = Math.min(alphas[i] + 0.4, 1.0);
+        }
       }
 
       // Snap back to origin
@@ -290,6 +319,25 @@
     tctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
 
+  // --- Update ripples (age + cleanup) ---
+  function updateRipples(dt) {
+    for (let i = ripples.length - 1; i >= 0; i--) {
+      ripples[i].age += dt;
+      if (ripples[i].age >= RIPPLE_DURATION) {
+        ripples.splice(i, 1);
+      }
+    }
+  }
+
+  // Listen for ripple events from app.js
+  window.addEventListener('particle-ripple', (e) => {
+    ripples.push({
+      x: e.detail.x / window.innerWidth,
+      y: e.detail.y / window.innerHeight,
+      age: 0,
+    });
+  });
+
   // --- Update trail ---
   function updateTrail() {
     if (pointer.active) {
@@ -357,12 +405,41 @@
   }
 
   // --- Animation loop ---
+  let lastFrameTime = 0;
   function animate(time) {
     requestAnimationFrame(animate);
+    const dt = Math.min(time - lastFrameTime, 50) || 16;
+    lastFrameTime = time;
+    updateRipples(dt);
     updateTrail();
     update(time);
     draw();
     drawTrail();
+    drawRipples();
+  }
+
+  // --- Draw ripple rings on 2D canvas ---
+  function drawRipples() {
+    for (const ripple of ripples) {
+      const progress = ripple.age / RIPPLE_DURATION;
+      const radius = RIPPLE_MAX_RADIUS * progress * window.innerWidth;
+      const alpha = (1 - progress) * 0.4;
+      const x = ripple.x * window.innerWidth;
+      const y = ripple.y * window.innerHeight;
+
+      tctx.beginPath();
+      tctx.arc(x, y, radius, 0, Math.PI * 2);
+      tctx.strokeStyle = `rgba(255, 85, 0, ${alpha})`;
+      tctx.lineWidth = 2;
+      tctx.stroke();
+
+      // Inner glow ring
+      tctx.beginPath();
+      tctx.arc(x, y, radius - 4, 0, Math.PI * 2);
+      tctx.strokeStyle = `rgba(255, 85, 0, ${alpha * 0.3})`;
+      tctx.lineWidth = 6;
+      tctx.stroke();
+    }
   }
 
   // --- Events ---

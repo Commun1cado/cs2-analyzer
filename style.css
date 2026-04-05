@@ -82,20 +82,26 @@ html, body {
   font-weight: 700;
   text-transform: uppercase;
   font-size: clamp(36px, 12vw, 72px);
-  display: block;
-  opacity: 0;
-  animation: titleReveal 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  display: flex;
+  gap: 0.02em;
 }
 
 .title-line--white {
   color: var(--white);
-  animation-delay: 0.2s;
 }
 
 .title-line--orange {
   color: var(--orange);
-  animation-delay: 0.45s;
   text-shadow: 0 0 40px var(--orange-glow);
+}
+
+/* Split letters */
+.char {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(40px) scale(0.8);
+  filter: blur(10px);
+  animation: charReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .subtitle {
@@ -106,7 +112,62 @@ html, body {
   letter-spacing: 0.15em;
   text-transform: uppercase;
   opacity: 0;
-  animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.7s forwards;
+  animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 1.2s forwards;
+}
+
+/* Live stats */
+.live-stats {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 6px 14px;
+  border: 1px solid rgba(255, 85, 0, 0.25);
+  border-radius: 100px;
+  background: rgba(255, 85, 0, 0.03);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity: 0;
+  animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 1.5s forwards;
+}
+
+.stat-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 9px;
+  color: var(--orange);
+  letter-spacing: 0.2em;
+  position: relative;
+  padding-left: 10px;
+}
+
+.stat-label::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--orange);
+  box-shadow: 0 0 8px var(--orange);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.stat-value {
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-weight: 500;
+  font-size: 11px;
+  color: var(--white);
+  letter-spacing: 0.05em;
+  min-width: 80px;
+  text-align: left;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: translateY(-50%) scale(1); }
+  50% { opacity: 0.4; transform: translateY(-50%) scale(0.8); }
 }
 
 /* --- Bottom Section --- */
@@ -126,7 +187,6 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
   padding: 14px 36px;
   background: var(--orange);
   color: var(--bg);
@@ -135,10 +195,19 @@ html, body {
   cursor: pointer;
   overflow: hidden;
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
 }
 
 .btn-connect:active {
   transform: scale(0.96);
+}
+
+.btn-magnet {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
 }
 
 .btn-text {
@@ -179,12 +248,7 @@ html, body {
 }
 
 /* --- Animations --- */
-@keyframes titleReveal {
-  from {
-    opacity: 0;
-    transform: translateY(30px) scale(0.95);
-    filter: blur(6px);
-  }
+@keyframes charReveal {
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
