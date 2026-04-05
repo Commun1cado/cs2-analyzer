@@ -37,44 +37,9 @@
   });
 
   // ============================================
-  // 2. MAGNETIC BUTTON
+  // 2. BUTTON CLICK
   // ============================================
   const btn = document.getElementById('connectBtn');
-  const magnet = document.getElementById('btnMagnet');
-  const btnStrength = 0.25;
-  const textStrength = 0.4;
-  let btnRect = null;
-  let rafId = null;
-
-  function updateBtnRect() {
-    btnRect = btn.getBoundingClientRect();
-  }
-
-  function onBtnMove(e) {
-    if (!btnRect) updateBtnRect();
-    const x = e.clientX - btnRect.left - btnRect.width / 2;
-    const y = e.clientY - btnRect.top - btnRect.height / 2;
-    cancelAnimationFrame(rafId);
-    rafId = requestAnimationFrame(() => {
-      btn.style.transform = `translate(${x * btnStrength}px, ${y * btnStrength}px)`;
-      magnet.style.transform = `translate(${x * textStrength}px, ${y * textStrength}px)`;
-    });
-  }
-
-  function onBtnLeave() {
-    cancelAnimationFrame(rafId);
-    btn.style.transform = '';
-    magnet.style.transform = '';
-  }
-
-  // Only enable magnetic on devices with hover
-  if (window.matchMedia('(hover: hover)').matches) {
-    btn.addEventListener('mouseenter', updateBtnRect);
-    btn.addEventListener('mousemove', onBtnMove);
-    btn.addEventListener('mouseleave', onBtnLeave);
-    window.addEventListener('resize', updateBtnRect);
-    window.addEventListener('scroll', updateBtnRect);
-  }
 
   btn.addEventListener('click', () => {
     if (tg) {

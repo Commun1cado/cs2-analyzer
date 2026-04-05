@@ -100,9 +100,10 @@ html, body {
   font-family: var(--font-display);
   font-weight: 700;
   text-transform: uppercase;
-  font-size: clamp(36px, 12vw, 72px);
+  font-size: clamp(56px, 17vw, 96px);
   display: flex;
   gap: 0.02em;
+  line-height: 0.95;
 }
 
 .title-line--white {
@@ -345,7 +346,7 @@ body::before {
   }
 
   .title-line {
-    font-size: clamp(56px, 10vw, 120px);
+    font-size: clamp(80px, 12vw, 140px);
   }
 
   .subtitle {
